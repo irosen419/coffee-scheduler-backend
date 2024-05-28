@@ -1,5 +1,9 @@
 const mongoose = require('mongoose')
-const schema = new mongoose.Schema({
+const shift = new mongoose.Schema({
+  employeeId: {
+    required: false,
+    type: String
+  },
   startTime: {
     required: true,
     type: String
@@ -10,4 +14,4 @@ const schema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Data', schema)
+module.exports = mongoose.model('Shift', shift)
