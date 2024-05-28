@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 
 //EMPLOYEES ROUTES
-const Employee = require('../models/employee');
+const Employee = require('../models/employee');//SHIFTS
+const Shift = require('../models/shift');
 
 //POST
 router.post('/employees', async (req, res) => {
@@ -37,8 +38,21 @@ router.get('/employees', async (req, res) => {
 //GET BY ID
 router.get('/employees/:id', async (req, res) => {
   try {
-    const data = await Employee.findById(req.params.id);
-    res.status(200).json(data)
+    let employee = await Employee.findById(req.params.id);
+    let role = await Role.findById(employee.roleId).role
+    res.status(200).json({ employee, role })
+  }
+  catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+});
+
+// GET EMPLOYEE'S SHIFTS
+router.get('/employees/:id/shifts', async (req, res) => {
+  try {
+    let query = { employeeId: req.params.id };
+    let shifts = await Shift.find(query)
+    res.status(200).json(shifts)
   }
   catch (err) {
     res.status(500).json({ message: err.message })
@@ -86,14 +100,15 @@ router.post('/roles', async (req, res) => {
   })
 
   try {
-    const savedData = await data.save()
-    res.status(200).json(savedData)
+    const newRoll = await data.save()
+    res.status(200).json(newRoll)
   }
   catch (err) {
     res.status(400).json({ message: err.message })
   }
 });
 
+//GET ALL
 router.get('/roles', async (req, res) => {
   try {
     const roles = await Role.find()
@@ -103,5 +118,37 @@ router.get('/roles', async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 })
+
+// GET BY ID
+router.get('/roles', async (req, res) => {
+  try {
+    const id = requ.params.id
+    const role = await Role.findById(id)
+    res.status(200).json(role)
+  }
+  catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+
+
+//POST
+router.post('/shifts', async (req, res) => {
+  let { body: { employeeId, startTime, endTime } } = req
+  let shift = new Shift({
+    employeeId: employeeId,
+    startTime: startTime,
+    endTime: endTime
+  })
+  try {
+    let newShift = await shift.save()
+    res.status(200).json(newShift)
+  }
+  catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 
 module.exports = router
